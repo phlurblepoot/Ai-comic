@@ -1,0 +1,98 @@
+{
+  "10": {
+    "class_type": "UNETLoader",
+    "inputs": {"unet_name": "{{CHECKPOINT}}", "weight_dtype": "fp8_e4m3fn"}
+  },
+  "11": {
+    "class_type": "DualCLIPLoader",
+    "inputs": {"clip_name1": "{{T5}}", "clip_name2": "{{CLIP_L}}", "type": "flux"}
+  },
+  "12": {
+    "class_type": "VAELoader",
+    "inputs": {"vae_name": "{{VAE}}"}
+  },
+  "20": {
+    "class_type": "LoadImage",
+    "inputs": {"image": "{{REFERENCE_IMAGE}}"}
+  },
+  "21": {
+    "class_type": "PulidFluxModelLoader",
+    "inputs": {"pulid_file": "{{PULID_MODEL}}"}
+  },
+  "22": {
+    "class_type": "PulidFluxInsightFaceLoader",
+    "inputs": {"provider": "CUDA"}
+  },
+  "23": {
+    "class_type": "PulidFluxEvaClipLoader",
+    "inputs": {}
+  },
+  "24": {
+    "class_type": "ApplyPulidFlux",
+    "inputs": {
+      "model": ["10", 0],
+      "pulid_flux": ["21", 0],
+      "eva_clip": ["23", 0],
+      "face_analysis": ["22", 0],
+      "image": ["20", 0],
+      "weight": 0.9,
+      "start_at": 0.0,
+      "end_at": 1.0
+    }
+  },
+  "30": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {"clip": ["11", 0], "text": "{{POSITIVE_PROMPT}}"}
+  },
+  "31": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {"clip": ["11", 0], "text": ""}
+  },
+  "40": {
+    "class_type": "LoadImage",
+    "inputs": {"image": "{{OPENPOSE_IMAGE}}"}
+  },
+  "41": {
+    "class_type": "ControlNetLoader",
+    "inputs": {"control_net_name": "{{OPENPOSE_CONTROLNET}}"}
+  },
+  "42": {
+    "class_type": "ControlNetApplyAdvanced",
+    "inputs": {
+      "positive": ["30", 0],
+      "negative": ["31", 0],
+      "control_net": ["41", 0],
+      "image": ["40", 0],
+      "strength": "{{OPENPOSE_STRENGTH}}",
+      "start_percent": 0.0,
+      "end_percent": 1.0
+    }
+  },
+  "50": {
+    "class_type": "EmptySD3LatentImage",
+    "inputs": {"width": "{{WIDTH}}", "height": "{{HEIGHT}}", "batch_size": 1}
+  },
+  "60": {
+    "class_type": "KSampler",
+    "inputs": {
+      "model": ["24", 0],
+      "positive": ["42", 0],
+      "negative": ["42", 1],
+      "latent_image": ["50", 0],
+      "seed": "{{SEED}}",
+      "steps": 28,
+      "cfg": 3.5,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0
+    }
+  },
+  "70": {
+    "class_type": "VAEDecode",
+    "inputs": {"samples": ["60", 0], "vae": ["12", 0]}
+  },
+  "80": {
+    "class_type": "SaveImage",
+    "inputs": {"images": ["70", 0], "filename_prefix": "{{OUTPUT_PREFIX}}"}
+  }
+}

@@ -1,0 +1,14 @@
+services:
+  ai-comic:
+    build: .
+    image: ai-comic:dev
+    container_name: ai-comic
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./data:/config
+    environment:
+      # Point at your remote (or local) ComfyUI instance.
+      AICOMIC_COMFY_URL: ${AICOMIC_COMFY_URL:-}
+      AICOMIC_COMFY_TOKEN: ${AICOMIC_COMFY_TOKEN:-}
+    restart: unless-stopped

@@ -1,0 +1,16 @@
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.pyc
+data/
+assets/
+*.db
+.ruff_cache
+.pytest_cache
+.vscode
+.idea
+README.md
+docker-compose.yml
+unraid/

@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Build / packaging
+dist/
+build/
+*.egg
+
+# Runtime data (lives in the mounted /config volume on Unraid, or ./data in dev)
+data/
+assets/
+*.db
+*.db-journal
+# Only ignore a literal /config symlink at the repo root if one exists for
+# local dev; the actual Python package is `config/` (also at the root) and is
+# NOT matched because of the trailing slash-with-directory test below.
+/config
+!/config/
+!/config/**
+
+# IDE
+.vscode/
+.idea/
+.DS_Store
+
+# Tooling
+.ruff_cache/
+.pytest_cache/

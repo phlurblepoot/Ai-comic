@@ -1,0 +1,20 @@
+# Registry of model filenames as they should appear on the remote ComfyUI host.
+# The UI uses these names when it fills out workflow JSON. If your remote host
+# uses different filenames, edit this file or override via the Settings tab.
+
+checkpoints:
+  flux_dev: flux1-dev-fp8.safetensors
+
+loras:
+  turnaround_sheet: flux-kontext-turnaround-sheet.safetensors
+
+controlnets:
+  openpose: flux-controlnet-openpose.safetensors
+  depth: flux-controlnet-depth.safetensors
+
+identity:
+  pulid: pulid-flux-v0.9.1.safetensors
+  ip_adapter: flux-ip-adapter.safetensors
+
+editing:
+  kontext: flux-kontext-dev.safetensors
