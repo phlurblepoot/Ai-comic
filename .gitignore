@@ -11,17 +11,13 @@ dist/
 build/
 *.egg
 
-# Runtime data (lives in the mounted /config volume on Unraid, or ./data in dev)
+# Runtime data (the Docker container mounts a host volume at /config, and
+# dev runs use ./data; nothing runtime lives inside the repo itself). We do
+# NOT ignore the Python package `config/` at the repo root.
 data/
 assets/
 *.db
 *.db-journal
-# Only ignore a literal /config symlink at the repo root if one exists for
-# local dev; the actual Python package is `config/` (also at the root) and is
-# NOT matched because of the trailing slash-with-directory test below.
-/config
-!/config/
-!/config/**
 
 # IDE
 .vscode/
