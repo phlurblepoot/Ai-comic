@@ -15,7 +15,7 @@ if [ "$CURRENT_UID" = "0" ]; then
     usermod  -o -u "${PUID}" aicomic 2>/dev/null || true
     # Fix /config ownership in case it was mounted as a different uid.
     chown -R aicomic:users /config 2>/dev/null || true
-    exec su-exec aicomic:users "$@"
+    exec gosu aicomic:users "$@"
 else
     # Already a non-root user (the normal path in the container) — just run.
     exec "$@"

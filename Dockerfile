@@ -19,7 +19,7 @@ RUN apt-get update \
         libpng16-16 \
         libwebp7 \
         tini \
-        su-exec \
+        gosu \
     && rm -rf /var/lib/apt/lists/*
 
 # Create an 'aicomic' user matching Unraid's default nobody:users (99:100) so
