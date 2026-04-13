@@ -19,6 +19,7 @@ RUN apt-get update \
         libpng16-16 \
         libwebp7 \
         tini \
+        su-exec \
     && rm -rf /var/lib/apt/lists/*
 
 # Create an 'aicomic' user matching Unraid's default nobody:users (99:100) so
@@ -50,10 +51,11 @@ COPY generators /app/generators
 COPY library /app/library
 COPY bubble /app/bubble
 COPY ui /app/ui
+COPY entrypoint.sh /entrypoint.sh
 
-RUN mkdir -p /config/assets && chown -R aicomic:users /config
-
-USER aicomic:users
+RUN chmod +x /entrypoint.sh \
+    && mkdir -p /config/assets \
+    && chown -R aicomic:users /config /app
 
 EXPOSE 7860
 VOLUME ["/config"]
@@ -61,5 +63,6 @@ VOLUME ["/config"]
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:7860/', timeout=3).read()" || exit 1
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
+# Run entrypoint as root so it can apply PUID/PGID, then drop to aicomic.
+ENTRYPOINT ["/usr/bin/tini", "--", "/entrypoint.sh"]
 CMD ["python", "app.py"]
