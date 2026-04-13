@@ -90,23 +90,56 @@ Unraid will find the image locally and won't need to pull it.
 
 ## Remote ComfyUI requirements
 
-The GPU host running ComfyUI needs the following models installed and ComfyUI
-started with `python main.py --listen 0.0.0.0`:
+The GPU host running ComfyUI needs Flux.1 dev plus a handful of supporting
+models. You have two ways to install them:
+
+### Easy: run the bundled download script on the ComfyUI host
+
+```bash
+git clone https://github.com/phlurblepoot/ai-comic.git /tmp/ai-comic
+export HF_TOKEN=hf_xxxxxxxxxxxxx   # from https://huggingface.co/settings/tokens
+                                   # accept the Flux.1-dev + Flux.1-Kontext-dev
+                                   # licenses first
+bash /tmp/ai-comic/scripts/download_models.sh /path/to/your/ComfyUI
+```
+
+The script is idempotent (safe to re-run — it skips files already present)
+and writes each weight into the correct `ComfyUI/models/<subfolder>/`. Start
+ComfyUI with `python main.py --listen 0.0.0.0 --port 8188` afterwards.
+
+### Then: verify from the UI
+
+Inside the app, open the **Models** tab and click **Re-check remote ComfyUI**.
+It'll query `/object_info` on your ComfyUI host and show a ✓/✗ for every
+required file, with copy-paste commands to fix anything missing.
+
+### Full model list
 
 | Purpose | Model |
 |---|---|
-| Base text-to-image | **Flux.1 dev** (fp8 recommended) |
+| Base text-to-image | **Flux.1 dev** (fp8) |
 | Character consistency | **PuLID-Flux** |
 | Style/reference conditioning | **Flux IP-Adapter** |
-| Image editing / outfit swap | **Flux Kontext** |
+| Image editing / outfit swap | **Flux Kontext dev** |
 | Character sheet turnarounds | **Flux Kontext Turnaround Sheet LoRA** |
-| Pose + scale control | **ControlNet OpenPose** (Flux version) |
-| Scene depth reuse | **ControlNet Depth** (Flux version) |
-| Depth extraction | **Depth-Anything V2** preprocessor |
+| Pose + scale control | **ControlNet OpenPose** (Flux, XLabs-AI) |
+| Scene depth reuse | **ControlNet Depth** (Flux, XLabs-AI) |
+| Depth extraction | **Depth-Anything V2** (large) |
+| Text encoders | **T5-XXL fp8 + CLIP-L** |
+| VAE | **FLUX.1 ae.safetensors** |
+| PuLID face features | **InsightFace antelopev2** |
 
-After installing models, edit `config/models.yaml` (in the container at
-`/app/config/models.yaml`) or the **Settings** tab if filename defaults
-don't match.
+### Custom nodes (not downloaded by the script)
+
+Install these via **ComfyUI Manager** on the GPU host, or `git clone` into
+`ComfyUI/custom_nodes/`:
+
+- `ComfyUI-PuLID-Flux-Enhanced` — PuLID nodes for Flux
+- `comfyui_controlnet_aux` — Depth-Anything preprocessor
+- `ComfyUI_IPAdapter_plus` — IP-Adapter nodes
+
+If any model filenames differ on your host, edit `config/models.yaml` or
+override the default checkpoint from the **Settings** tab.
 
 ---
 

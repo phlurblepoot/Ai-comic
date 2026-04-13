@@ -119,6 +119,45 @@ class ComfyUIClient:
         except (KeyError, IndexError, TypeError):
             return []
 
+    def list_models(self, kind: str) -> list[str]:
+        """Return filenames available on the remote host for a given model kind.
+
+        ``kind`` is one of: ``unet``, ``checkpoint``, ``clip``, ``vae``,
+        ``lora``, ``controlnet``, ``pulid``, ``ipadapter``. The function maps
+        each kind to a ComfyUI loader node and introspects its input options.
+        Unknown kinds return ``[]``.
+        """
+        lookups: dict[str, tuple[str, list[str]]] = {
+            # kind -> (node class_type, [keypath...] into input.required)
+            "unet":       ("UNETLoader",              ["unet_name"]),
+            "checkpoint": ("CheckpointLoaderSimple",  ["ckpt_name"]),
+            "clip":       ("DualCLIPLoader",          ["clip_name1", "clip_name2"]),
+            "vae":        ("VAELoader",               ["vae_name"]),
+            "lora":       ("LoraLoaderModelOnly",     ["lora_name"]),
+            "controlnet": ("ControlNetLoader",        ["control_net_name"]),
+            "pulid":      ("PulidFluxModelLoader",    ["pulid_file"]),
+            "ipadapter":  ("IPAdapterModelLoader",    ["ipadapter_file"]),
+        }
+        entry = lookups.get(kind)
+        if entry is None:
+            return []
+        node_type, input_keys = entry
+        try:
+            info = self.object_info()
+            node = info.get(node_type)
+            if not node:
+                return []
+            required = node["input"]["required"]
+            names: set[str] = set()
+            for key in input_keys:
+                if key in required:
+                    opts = required[key][0]
+                    if isinstance(opts, list):
+                        names.update(opts)
+            return sorted(names)
+        except (KeyError, IndexError, TypeError):
+            return []
+
     def upload_image(self, image: Image.Image | bytes, filename: str, *, image_type: str = "input", overwrite: bool = True) -> dict[str, Any]:
         """Upload an image to ComfyUI's input/temp folder. Returns the JSON
         response which includes the filename/subfolder/type the workflow should

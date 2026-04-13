@@ -5,7 +5,7 @@ from __future__ import annotations
 import gradio as gr
 
 from config import get_settings
-from ui.tabs import bubble, characters, compose, library, outfits, scenes, settings as settings_tab
+from ui.tabs import bubble, characters, compose, library, models, outfits, scenes, settings as settings_tab
 
 
 def build_app() -> gr.Blocks:
@@ -30,6 +30,8 @@ def build_app() -> gr.Blocks:
                 bubble.render()
             with gr.Tab("Library"):
                 library.render()
+            with gr.Tab("Models"):
+                models.render()
             with gr.Tab("Settings"):
                 settings_tab.render()
     return app
