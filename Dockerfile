@@ -24,8 +24,10 @@ RUN apt-get update \
 
 # Create an 'aicomic' user matching Unraid's default nobody:users (99:100) so
 # the /config bind-mount on /mnt/user/appdata ends up with correct ownership.
-RUN groupadd -g 100 -o users \
-    && useradd -u 99 -g 100 -M -s /usr/sbin/nologin aicomic
+# The `users` group (GID 100) typically already ships in Debian base images,
+# so only create it if it's missing. Same for the user.
+RUN (getent group users >/dev/null || groupadd -g 100 users) \
+    && (getent passwd aicomic >/dev/null || useradd -u 99 -g 100 -M -s /usr/sbin/nologin aicomic)
 
 WORKDIR /app
 
