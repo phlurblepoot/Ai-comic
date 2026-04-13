@@ -11,6 +11,5 @@ assets/
 .pytest_cache
 .vscode
 .idea
-README.md
 docker-compose.yml
 unraid/
